@@ -48,15 +48,37 @@ const convertDistrictDbObjectToResponseObject = dbObject => {
   }
 }
 
+// app.get('/states/', async (request, response) => {
+//   const getStatesQuery = `
+//     SELECT
+//       *
+//     FROM
+//       state;`
+//   const statesArray = await database.all(getStatesQuery)
+//   response.send(statesArray)
+// })
 app.get('/states/', async (request, response) => {
-  const getStatesQuery = `
-    SELECT
-      *
-    FROM
-      state;`
-  const statesArray = await database.all(getStatesQuery)
-  response.send(statesArray)
+  try {
+    const getStatesQuery = `
+      SELECT
+        *
+      FROM
+        state;`
+    const statesArray = await database.all(getStatesQuery)
+
+    // Map over the states and convert each database object to a response object
+    const statesResponse = statesArray.map(eachState =>
+      convertstateDbObjectToResponseObject(eachState),
+    )
+
+    // Send the response with the array of states
+    response.send(statesResponse)
+  } catch (error) {
+    // If an error occurs, send an error response
+    response.status(500).send(error.message)
+  }
 })
+
 
 app.get('/states/:stateId/', async (request, response) => {
   const {stateId} = request.params
